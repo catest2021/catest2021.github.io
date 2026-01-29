@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Callback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .success { 
+            color: green; 
+            font-weight: bold;
+        }
+        .error { 
+            color: red; 
+            font-weight: bold;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 15px;
+            display: block;
+            margin: 10px 0;
+            word-break: break-all;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #0366d6;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>OAuth Callback</h1>
+    <div id="result"></div>
+    
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+        const resultDiv = document.getElementById('result');
+        
+        if (error) {
+            resultDiv.innerHTML = `
+                <p class="error">❌ Authorization failed!</p>
+                <p>Error: ${error}</p>
+                <p>${urlParams.get('error_description') || ''}</p>
+                <p><a href="index.html">← Try again</a></p>
+            `;
+        } else if (code) {
+            resultDiv.innerHTML = `
+                <p class="success">✅ Authorization successful!</p>
+                
+                <div class="info">
+                    <h3>Authorization Code Received:</h3>
+                    <code>${code}</code>
+                </div>
+                
+                <div class="info">
+                    <h3>Next Step: Exchange for Access Token</h3>
+                    <p>Run this command in your terminal (replace YOUR_CLIENT_ID and YOUR_CLIENT_SECRET):</p>
+                    <code>curl -X POST https://github.com/login/oauth/access_token \\
+  -H "Accept: application/json" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "client_id": "YOUR_CLIENT_ID",
+    "client_secret": "YOUR_CLIENT_SECRET",
+    "code": "${code}"
+  }'</code>
+                </div>
+                
+                <p><a href="index.html">← Back to home</a></p>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <p class="error">❌ No authorization code received</p>
+                <p><a href="index.html">← Back to home</a></p>
+            `;
+        }
+    </script>
+</body>
+</html>
